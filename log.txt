@@ -1,0 +1,8 @@
+example curl:
+curl -X PUT http://127.0.0.1:8888 -d "{'who':'Google', 'what':'alert(\"wewt\")'}"
+
+Next:
+
+1. better regex to find the window you want
+2. allow specifiying files to download and eval
+3. windmill core in windows
