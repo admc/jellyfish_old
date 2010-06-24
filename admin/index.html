@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <title>JellyFish Admin</title>
+        <link type="text/css" href="css/BespinEmbedded.css" rel="stylesheet">
+        <link type="text/css" href="css/overcast/jquery-ui-1.8.2.custom.css" rel="stylesheet" />
+        <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script>
+        <script type="text/javascript" src="js/BespinEmbedded.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                // Tabs
+                $('#tabs').tabs();
+
+                // Dialog
+                $('#dialog').dialog({
+                    autoOpen: false,
+                    width: 600,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog("close");
+                        },
+                        "Cancel": function() {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            });
+
+            window.onBespinLoad = function() {
+                window.bespin = document.getElementById("editor").bespin;
+            };
+
+            var doExec = function() {
+              data = {};
+              data.who = document.getElementById('who').value;
+              data.what = bespin.value;
+
+              $.post('/assign', JSON.stringify(data), function(data) {
+                  var log = document.getElementById('log');
+                  var dataStr = JSON.stringify(data);
+                  log.innerHTML += dataStr + "<br>";
+              });
+            }
+        </script>
+        <style type="text/css">
+            /*demo page css*/
+            body { padding: 20px; font-family: Calibri, Helvetica, Arial; }
+            .demoHeaders { margin-top: 2em; }
+            #dialog_link {padding: .4em 1em .4em 20px;text-decoration: none;position: relative;}
+            #dialog_link span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px;}
+            ul#icons {margin: 0; padding: 0;}
+            ul#icons li {margin: 2px; position: relative; padding: 4px 0; cursor: pointer; float: left;  list-style: none;}
+            ul#icons span.ui-icon {float: left; margin: 0 4px;}
+            .bespin { margin: 0; padding: 0; border: 0; height: 300px; border: 2px solid #ddd;}
+            .displaybutton { margin-top: 1em; }
+        </style>
+    </head>
+    <body>
+    <h1>JellyFish Admin</h1>
+
+        <!-- Tabs -->
+        <div id="tabs">
+            <ul>
+                <li><a href="#tabs-1">Execute</a></li>
+                <li><a href="#tabs-2">Log</a></li>
+                <li><a href="#tabs-3">Third</a></li>
+            </ul>
+            <div id="tabs-1">
+              <div>Who: <input id="who" size=40></input></div>
+              <div>What: <br>
+                <div id="editor" class="bespin" data-bespinoptions='{ "settings": { "strictlines": true }, "syntax": "js", "stealFocus": true }'></div></div>
+              <p><a href="javascript:doExec();" id="dialog_link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span>Run that Sheezy</a></p></div>
+            <div id="tabs-2"><div id="log" style="height:300px;overflow:auto;"></div></div>
+            <div id="tabs-3">Nam dui erat, auctor a, dignissim quis, sollicitudin eu, felis. Pellentesque nisi urna, interdum eget, sagittis et, consequat vestibulum, lacus. Mauris porttitor ullamcorper augue.</div>
+        </div>
+
+        <!-- ui-dialog -->
+        <div id="dialog" title="Dialog Title">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+
+    </body>
+</html>
