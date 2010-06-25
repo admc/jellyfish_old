@@ -13,13 +13,13 @@ var tentacles = {};
 var assign = function(who, what) {
   var matches = {};
 
-  for (var nemato in tentacles) {
-    var obj = tentacles[nemato];
+  for (var tentacle in tentacles) {
+    var obj = tentacles[tentacle];
     //needs to be expanded to match via url or title regex
     if (obj.title.indexOf(who) != -1) {
        obj.queue.push(what);
-       sys.puts('Assigned: '+what+' to: '+obj.title+', nemato: '+nemato);
-       matches[nemato] = obj;
+       sys.puts('Assigned: '+what+' to: '+obj.title+', tentacle: '+tentacle);
+       matches[tentacle] = obj;
     }
   }
   return matches;
@@ -33,6 +33,13 @@ var finish = function(req, res, data) {
   res.writeHead(200, req.headers);
   res.write(dataString);
   res.end();
+}
+
+var addTentacle = function (tObj, id) {
+    tObj.active = true;
+    tObj.queue = [];
+    tentacles[id] = tObj;
+    return tObj
 }
 
 var requestHandler = function (req, res) {
@@ -53,25 +60,41 @@ var requestHandler = function (req, res) {
     finish(req, res, data);
   }
   //register frames
-  else if (pathname.indexOf('jelly-net/add') != -1) {
+  else if (pathname.indexOf('jelly-net/wake') != -1) {
     var newDate = new Date;
     var id = newDate.getTime();
-    req.addListener("data", function (chunk) {
-      sys.puts("Adding tentacle, "+id+" : "+chunk);
-      eval("var tObj="+chunk);
-      tObj.active = true;
-      tObj.queue = [];
-      tentacles[id] = tObj;
-    })
     var data = {};
-    data.id = id;
-    finish(req, res, data);
+    
+    req.addListener("data", function (chunk) {
+      eval("var tObj="+chunk);
+      //if we have a legit tid
+      if (isNaN(parseInt(tObj.tid))) {
+        sys.puts("Adding tentacle, "+id+" : "+chunk);
+        addTentacle(tObj, id);
+        data.id = id;
+      }
+      else {
+        //if the state is still around for the session id, use it
+        if (tentacles[tObj.tid] && tentacles[tObj.tid]['active']) {
+          sys.puts("Waking tentacle, "+id+" : "+chunk);
+          tentacles[tObj.tid]['active'] = true;
+        }
+        //otherwise, create a new one with the old ID
+        else {
+          sys.puts("Resuming tentacle session, "+id+" : "+chunk);
+          addTentacle(tObj, tObj.tid);
+        }
+        data.id = tObj.tid;
+      }
+      finish(req, res, data);
+    })
   }
   //unregister frames
-  else if (pathname.indexOf('jelly-net/rm') != -1) {
+  else if (pathname.indexOf('jelly-net/sleep') != -1) {
     var tid = pathname.split("=")[1];
-    sys.puts("Removing tentacle: "+tid+": "+JSON.stringify(tentacles[tid]));
-    delete tentacles[tid];
+    sys.puts("Sleeping tentacle: "+tid+": "+JSON.stringify(tentacles[tid]));
+    //delete tentacles[tid];
+    tentacles[tid].active = false;
 
     var data = "OK";
     finish(req, res, data);
@@ -105,7 +128,7 @@ var requestHandler = function (req, res) {
         // modify the html content
         if (response.headers['content-type'].indexOf("text/html") != -1) {
           if (chunk.toString().indexOf('</head>')) {
-            var includes =  '<script type="text/javascript" src="/jelly-serv/jquery-1.4.2.js"></script><script type="text/javascript" src="/jelly-serv/jelly.js"></script><script type="text/javascript" src="/jelly-serv/wm.js"></script></head>';
+            var includes =  '<script type="text/javascript" src="/jelly-serv/jquery-1.4.2.js"></script><script type="text/javascript" src="/jelly-serv/nemato.js"></script><script type="text/javascript" src="/jelly-serv/user.js"></script></head>';
             chunk = chunk.toString().replace('</head>', includes);
           }
         }

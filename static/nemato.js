@@ -7,7 +7,7 @@ function run (data) {
 function waitForMsg() {
   $jellyQ.ajax({
     type: "GET",
-    url: "/jelly-poll?tid="+window.jellyId,
+    url: "/jelly-poll?tid="+sessionStorage.tid,
     async: true,
     cache: true,
     timeout:50000,
@@ -31,18 +31,19 @@ $jellyQ(document).ready(function(){
   data.title = window.document.title;
   data.url = window.location.href;
   data.agent = navigator.userAgent;
+  data.tid = sessionStorage.tid;
   
-  $jellyQ.post('/jelly-net/add', JSON.stringify(data), function(data) {
-  window.jellyId = data.id;
-  waitForMsg();
+  $jellyQ.post('/jelly-net/wake', JSON.stringify(data), function(data) {
+    sessionStorage.tid = data.id;
+    waitForMsg();
   }, 'json');
 });
 
-var oldbeforeunload = window.onbeforeunload;
+/*var oldbeforeunload = window.onbeforeunload;
 window.onbeforeunload = function() {
   $jellyQ.post('/jelly-net/rm?tid='+window.jellyId, window.jellyId, function(data){});
   
   if (oldbeforeunload) {
     oldbeforeunload();
   }
-};
+};*/
