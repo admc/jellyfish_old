@@ -6,6 +6,16 @@ var sys = require("sys")
   ,WEBROOT = path.join(path.dirname(__filename), 'static')
   ,ADMIN = path.join(path.dirname(__filename), 'admin');
 
+//create an array of the cli args, each represents a .js file
+//for example user means include user.js in each page
+var args = [];
+process.argv.forEach(function (val, index, array) {
+  if (index > 1) {
+    sys.puts("Enabling module: "+val);
+    args.push(val);
+  }
+});
+
 //Global registry of browsers
 var tentacles = {};
 
@@ -128,7 +138,13 @@ var requestHandler = function (req, res) {
         // modify the html content
         if (response.headers['content-type'].indexOf("text/html") != -1) {
           if (chunk.toString().indexOf('</head>')) {
-            var includes =  '<script type="text/javascript" src="/jelly-serv/jquery-1.4.2.js"></script><script type="text/javascript" src="/jelly-serv/nemato.js"></script><script type="text/javascript" src="/jelly-serv/user.js"></script></head>';
+            var includes = '<script type="text/javascript" src="/jelly-serv/jquery-1.4.2.js"></script>';
+            includes += '<script type="text/javascript" src="/jelly-serv/nemato.js"></script>';
+            //include each of the args specified on the CLI
+            args.forEach(function (val, index, array) {
+              includes += '<script type="text/javascript" src="/jelly-serv/'+val+'.js"></script>';
+            });
+            includes += '</head>';
             chunk = chunk.toString().replace('</head>', includes);
           }
         }
@@ -167,6 +183,9 @@ http.createServer(function (req, res) {
         var resp = assign(wave.who, wave.what);
         finish(req, res, resp);
     });
+  }
+  if (pathname.indexOf("list") != -1) {
+        finish(req, res, tentacles);
   }
   else {
     paperboy

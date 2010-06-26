@@ -8,6 +8,7 @@
         <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script>
         <script type="text/javascript" src="js/BespinEmbedded.js"></script>
+        <script type="text/javascript" src="js/shell.js"></script>
         <script type="text/javascript">
             $(function(){
                 // Tabs
@@ -39,10 +40,17 @@
 
               $.post('/assign', JSON.stringify(data), function(data) {
                   var log = document.getElementById('log');
-                  var dataStr = JSON.stringify(data);
-                  log.innerHTML += dataStr + "<br>";
+                  log.innerHTML += "<div>"+JSON.stringify(data)+"</div>";
               });
-            }
+            };
+
+            var jelly = {};
+            
+            jelly.list = function() {
+              $.post('/list', '{}', function(data) {
+                  logic.send(JSON.stringify(data));
+              });
+            };
         </script>
         <style type="text/css">
             /*demo page css*/
@@ -73,7 +81,7 @@
                 <div id="editor" class="bespin" data-bespinoptions='{ "settings": { "strictlines": true }, "syntax": "js", "stealFocus": true }'></div></div>
               <p><a href="javascript:doExec();" id="dialog_link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span>Assign Wave</a></p></div>
             <div id="tabs-2"><div id="log" style="height:300px;overflow:auto;"></div></div>
-            <div id="tabs-3">Nam dui erat, auctor a, dignissim quis, sollicitudin eu, felis. Pellentesque nisi urna, interdum eget, sagittis et, consequat vestibulum, lacus. Mauris porttitor ullamcorper augue.</div>
+            <div id="tabs-3"><div id="shell"></div></div>
         </div>
 
         <!-- ui-dialog -->
