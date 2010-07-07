@@ -58,8 +58,8 @@ logic.handle = function(cmd) {
   
   switch(cmdArr[0]) {
   //clear window 
-  case 'clear':
-    this.jout().innerHTML = "";
+  case 'list':
+    jelly.list();
     break;
   
   case 'exit':
@@ -91,9 +91,7 @@ logic.handle = function(cmd) {
   case 'help':
     var opts = [];
     opts.push('<b>XUSH Help!<b>')
-    opts.push('dir -- default shows you the current scope, \'dir obj\' or \'dir(obj)\' will show you the properties of the object.');
-    opts.push('window -- reference to current content window.');
-    opts.push('clear -- reset the output.');
+    opts.push('list -- show me all the active sessions.');
     
     while(opts.length != 0) {
       this.send(opts.pop());

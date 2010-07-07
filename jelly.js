@@ -86,12 +86,12 @@ var requestHandler = function (req, res) {
       else {
         //if the state is still around for the session id, use it
         if (tentacles[tObj.tid] && tentacles[tObj.tid]['active']) {
-          sys.puts("Waking tentacle, "+id+" : "+chunk);
+          sys.puts("Waking tentacle, "+tObj.tid+" : "+chunk);
           tentacles[tObj.tid]['active'] = true;
         }
         //otherwise, create a new one with the old ID
         else {
-          sys.puts("Resuming tentacle session, "+id+" : "+chunk);
+          sys.puts("Resuming tentacle session, "+tObj.tid+" : "+chunk);
           addTentacle(tObj, tObj.tid);
         }
         data.id = tObj.tid;
